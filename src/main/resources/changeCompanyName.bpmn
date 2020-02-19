@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1xzi8i3" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.6.0">
+  <bpmn:process id="changeCompanyName" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="task start">
+      <bpmn:outgoing>SequenceFlow_0p7ofmy</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="taskComplete" name="task complete">
+      <bpmn:incoming>userConfirmDocumentValidityPassed</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1eec9oc">
+      <bpmn:incoming>userConfirmDocumentValidityCompleted</bpmn:incoming>
+      <bpmn:outgoing>userConfirmDocumentValidityPassed</bpmn:outgoing>
+      <bpmn:outgoing>userConfirmDocumentValidityFailed</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="fraudValidationGateway">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="#{fraudValidation == &#39;pass&#39;}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0t44bti</bpmn:incoming>
+      <bpmn:outgoing>passedFraudValidation</bpmn:outgoing>
+      <bpmn:outgoing>failedFraudValidation</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="taskReroute" name="task reroute">
+      <bpmn:incoming>failedFraudValidation</bpmn:incoming>
+      <bpmn:incoming>userConfirmDocumentValidityFailed</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0t44bti" sourceRef="fraudValidationService" targetRef="fraudValidationGateway" />
+    <bpmn:sequenceFlow id="passedFraudValidation" name="pass" sourceRef="fraudValidationGateway" targetRef="userConfirmDocumentValidity">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{fraudValidation == 'pass'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="failedFraudValidation" name="fail" sourceRef="fraudValidationGateway" targetRef="taskReroute">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{fraudValidation == 'fail'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="userConfirmDocumentValidityCompleted" sourceRef="userConfirmDocumentValidity" targetRef="ExclusiveGateway_1eec9oc" />
+    <bpmn:sequenceFlow id="userConfirmDocumentValidityPassed" name="pass" sourceRef="ExclusiveGateway_1eec9oc" targetRef="taskComplete">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{userConfirmation == 'pass'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="userConfirmDocumentValidityFailed" name="fail" sourceRef="ExclusiveGateway_1eec9oc" targetRef="taskReroute">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{userConfirmation == 'fail'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="fraudValidationService" name="fraud validation" camunda:delegateExpression="%{retrieveValidation}">
+      <bpmn:incoming>SequenceFlow_0p7ofmy</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0t44bti</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="userConfirmDocumentValidity" name="confirm document validity">
+      <bpmn:incoming>passedFraudValidation</bpmn:incoming>
+      <bpmn:outgoing>userConfirmDocumentValidityCompleted</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0p7ofmy" sourceRef="StartEvent_1" targetRef="fraudValidationService" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="changeCompanyName">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="192" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="189" y="425" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_09kynvh_di" bpmnElement="taskComplete">
+        <dc:Bounds x="1392" y="82" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1377" y="125" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1eec9oc_di" bpmnElement="ExclusiveGateway_1eec9oc" isMarkerVisible="true">
+        <dc:Bounds x="1275" y="245" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0ngqn75_di" bpmnElement="fraudValidationGateway" isMarkerVisible="true">
+        <dc:Bounds x="935" y="245" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0kck6nv_di" bpmnElement="taskReroute">
+        <dc:Bounds x="1112" y="682" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1101" y="725" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0t44bti_di" bpmnElement="SequenceFlow_0t44bti">
+        <di:waypoint x="830" y="270" />
+        <di:waypoint x="935" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0m5nylg_di" bpmnElement="passedFraudValidation">
+        <di:waypoint x="985" y="270" />
+        <di:waypoint x="1070" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1016" y="252" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1g8zi7v_di" bpmnElement="failedFraudValidation">
+        <di:waypoint x="960" y="295" />
+        <di:waypoint x="960" y="700" />
+        <di:waypoint x="1112" y="700" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="968" y="495" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0i9w3nd_di" bpmnElement="userConfirmDocumentValidityCompleted">
+        <di:waypoint x="1170" y="270" />
+        <di:waypoint x="1275" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0p7ec9x_di" bpmnElement="userConfirmDocumentValidityPassed">
+        <di:waypoint x="1300" y="245" />
+        <di:waypoint x="1300" y="100" />
+        <di:waypoint x="1392" y="100" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1303" y="176" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ik0aek_di" bpmnElement="userConfirmDocumentValidityFailed">
+        <di:waypoint x="1300" y="295" />
+        <di:waypoint x="1300" y="700" />
+        <di:waypoint x="1148" y="700" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1308" y="495" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1hgxnxg_di" bpmnElement="fraudValidationService">
+        <dc:Bounds x="730" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0wxfjt6_di" bpmnElement="userConfirmDocumentValidity">
+        <dc:Bounds x="1070" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0p7ofmy_di" bpmnElement="SequenceFlow_0p7ofmy">
+        <di:waypoint x="228" y="400" />
+        <di:waypoint x="479" y="400" />
+        <di:waypoint x="479" y="270" />
+        <di:waypoint x="730" y="270" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
