@@ -38,7 +38,7 @@
     <bpmn:sequenceFlow id="userConfirmDocumentValidityFailed" name="fail" sourceRef="ExclusiveGateway_1eec9oc" targetRef="taskReroute">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{userConfirmation == 'fail'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="fraudValidationService" name="fraud validation" camunda:delegateExpression="%{retrieveValidation}">
+    <bpmn:serviceTask id="fraudValidationService" name="fraud validation" camunda:delegateExpression="${retrieveValidation}">
       <bpmn:incoming>SequenceFlow_0p7ofmy</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0t44bti</bpmn:outgoing>
     </bpmn:serviceTask>
