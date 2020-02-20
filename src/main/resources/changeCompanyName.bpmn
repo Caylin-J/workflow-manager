@@ -4,9 +4,6 @@
     <bpmn:startEvent id="StartEvent_1" name="task start">
       <bpmn:outgoing>SequenceFlow_0p7ofmy</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:endEvent id="taskComplete" name="task complete">
-      <bpmn:incoming>userConfirmDocumentValidityPassed</bpmn:incoming>
-    </bpmn:endEvent>
     <bpmn:exclusiveGateway id="ExclusiveGateway_1eec9oc">
       <bpmn:incoming>userConfirmDocumentValidityCompleted</bpmn:incoming>
       <bpmn:outgoing>userConfirmDocumentValidityPassed</bpmn:outgoing>
@@ -31,8 +28,10 @@
     <bpmn:sequenceFlow id="failedFraudValidation" name="fail" sourceRef="fraudValidationGateway" targetRef="taskReroute">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{fraudValidation == 'fail'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="userConfirmDocumentValidityCompleted" sourceRef="userConfirmDocumentValidity" targetRef="ExclusiveGateway_1eec9oc" />
-    <bpmn:sequenceFlow id="userConfirmDocumentValidityPassed" name="pass" sourceRef="ExclusiveGateway_1eec9oc" targetRef="taskComplete">
+    <bpmn:sequenceFlow id="userConfirmDocumentValidityCompleted" sourceRef="userConfirmDocumentValidity" targetRef="ExclusiveGateway_1eec9oc">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{userConfirmation == 'pass'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="userConfirmDocumentValidityPassed" name="pass" sourceRef="ExclusiveGateway_1eec9oc" targetRef="Task_16wsudg">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{userConfirmation == 'pass'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="userConfirmDocumentValidityFailed" name="fail" sourceRef="ExclusiveGateway_1eec9oc" targetRef="taskReroute">
@@ -47,19 +46,28 @@
       <bpmn:outgoing>userConfirmDocumentValidityCompleted</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="SequenceFlow_0p7ofmy" sourceRef="StartEvent_1" targetRef="fraudValidationService" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ahwj5m" sourceRef="Task_1su7fiy" targetRef="taskComplete" />
+    <bpmn:serviceTask id="Task_16wsudg" name="await document" camunda:delegateExpression="${awaitDocumentService}">
+      <bpmn:incoming>userConfirmDocumentValidityPassed</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0a418w8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_1su7fiy" name="generate receipt" camunda:delegateExpression="${generateReceiptService}">
+      <bpmn:incoming>SequenceFlow_0a418w8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ahwj5m</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="taskComplete" name="task complete">
+      <bpmn:incoming>SequenceFlow_1ahwj5m</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1rwx776" messageRef="Message_0djo9vq" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0a418w8" sourceRef="Task_16wsudg" targetRef="Task_1su7fiy" />
   </bpmn:process>
+  <bpmn:message id="Message_0djo9vq" name="Task Completed" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="changeCompanyName">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="192" y="382" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="189" y="425" width="45" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_09kynvh_di" bpmnElement="taskComplete">
-        <dc:Bounds x="1392" y="82" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1377" y="125" width="67" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_1eec9oc_di" bpmnElement="ExclusiveGateway_1eec9oc" isMarkerVisible="true">
@@ -75,7 +83,7 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0t44bti_di" bpmnElement="SequenceFlow_0t44bti">
-        <di:waypoint x="830" y="270" />
+        <di:waypoint x="660" y="270" />
         <di:waypoint x="935" y="270" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0m5nylg_di" bpmnElement="passedFraudValidation">
@@ -99,10 +107,10 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0p7ec9x_di" bpmnElement="userConfirmDocumentValidityPassed">
         <di:waypoint x="1300" y="245" />
-        <di:waypoint x="1300" y="100" />
-        <di:waypoint x="1392" y="100" />
+        <di:waypoint x="1300" y="80" />
+        <di:waypoint x="1340" y="80" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1303" y="176" width="24" height="14" />
+          <dc:Bounds x="1258" y="87" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1ik0aek_di" bpmnElement="userConfirmDocumentValidityFailed">
@@ -114,7 +122,7 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1hgxnxg_di" bpmnElement="fraudValidationService">
-        <dc:Bounds x="730" y="230" width="100" height="80" />
+        <dc:Bounds x="560" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="UserTask_0wxfjt6_di" bpmnElement="userConfirmDocumentValidity">
         <dc:Bounds x="1070" y="230" width="100" height="80" />
@@ -123,7 +131,27 @@
         <di:waypoint x="228" y="400" />
         <di:waypoint x="479" y="400" />
         <di:waypoint x="479" y="270" />
-        <di:waypoint x="730" y="270" />
+        <di:waypoint x="560" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ahwj5m_di" bpmnElement="SequenceFlow_1ahwj5m">
+        <di:waypoint x="1650" y="80" />
+        <di:waypoint x="1812" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_15e13jz_di" bpmnElement="Task_16wsudg">
+        <dc:Bounds x="1340" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1lwfxph_di" bpmnElement="Task_1su7fiy">
+        <dc:Bounds x="1550" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0w7ma53_di" bpmnElement="taskComplete">
+        <dc:Bounds x="1812" y="62" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1797" y="105" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0a418w8_di" bpmnElement="SequenceFlow_0a418w8">
+        <di:waypoint x="1440" y="80" />
+        <di:waypoint x="1550" y="80" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
