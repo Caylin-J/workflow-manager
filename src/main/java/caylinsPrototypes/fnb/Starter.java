@@ -10,7 +10,7 @@ public class Starter implements InitializingBean {
     private RuntimeService runtimeService;
 
     public void afterPropertiesSet() throws Exception {
-        runtimeService.startProcessInstanceByKey("changeCompanyName");
+        runtimeService.startProcessInstanceByKey("Process_0dv9pic");
     }
 
     public void setRuntimeService(RuntimeService runtimeService) {

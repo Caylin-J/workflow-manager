@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="Definitions_1e8zu6b" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.6.0">
+  <decision id="routeDecision" name="roule router">
+    <extensionElements>
+      <biodi:bounds x="157" y="81" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable_1">
+      <input id="input_1" label="UCN">
+        <inputExpression id="inputExpression_1" typeRef="boolean">
+          <text>ucn</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0gqd4br" label="Risk Rating">
+        <inputExpression id="LiteralExpression_1qo7r4u" typeRef="integer">
+          <text>riskRating</text>
+        </inputExpression>
+      </input>
+      <output id="output_1" label="Route to take" name="routeTo" typeRef="string" />
+      <rule id="DecisionRule_1iqedad">
+        <inputEntry id="UnaryTests_1gic0bc">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1o3iro4">
+          <text>&gt;=5</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_14a035q">
+          <text>autopass</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_057mtds">
+        <inputEntry id="UnaryTests_0j0vnec">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0mj3yym">
+          <text>&lt;=5</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0a9gvrk">
+          <text>automated</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_006om5c">
+        <inputEntry id="UnaryTests_0kcqqwo">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0yvp1gp">
+          <text>&gt;=5</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1pnn9yl">
+          <text>manual</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0dx5gfo">
+        <inputEntry id="UnaryTests_033q7og">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0d5ik0r">
+          <text>&lt;=5</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_18bu17g">
+          <text>autofail</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0xl031p">
+        <inputEntry id="UnaryTests_0nlq61k">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1p1mmu9">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0nx92ta">
+          <text>autofail</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1ba2zrn">
+        <inputEntry id="UnaryTests_0db8akk">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1osz8nb">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_17pxtv3">
+          <text></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
