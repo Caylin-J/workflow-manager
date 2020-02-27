@@ -1,43 +1,42 @@
 package caylinsPrototypes.fnb;
 
-import org.camunda.bpm.dmn.engine.DmnDecision;
+import listeners.TaskListener;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.spring.ProcessEngineFactoryBean;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.transaction.PlatformTransactionManager;
-import services.AwaitDocumentService;
-import services.CipcValidationService;
-import services.GenerateReceiptService;
-import services.RetrieveUserRequestService;
+import services.*;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
+/**
+ * Stores Camunda engine configuration and initializes services as beans
+*/
 
 @Configuration
 public class ServiceApplicationContext {
 
     @Autowired
     private ResourceLoader resourceLoader;
+
     @Autowired
     private static DmnEngine dmnEngine;
     private Resource resource;
 
-
+    /**
+     * Camunda Engine Configuration
+     */
     @Bean
     public SpringProcessEngineConfiguration engineConfiguration(DataSource dataSource,
                                                                 PlatformTransactionManager transactionManager,
-                                                                @Value("classpath*:*.bpmn, *.dmn") Resource[] deploymentResources)
-    {
+                                                                @Value("classpath*:*mn") Resource[] deploymentResources) {
         SpringProcessEngineConfiguration configuration = new SpringProcessEngineConfiguration();
         configuration.setProcessEngineName("engine");
         configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
@@ -46,19 +45,23 @@ public class ServiceApplicationContext {
         configuration.setDatabaseSchemaUpdate("true");
         configuration.setJobExecutorActivate(false);
         configuration.setDeploymentResources(deploymentResources);
-
+        //dmn configuration
+        configuration.setDmnEnabled(true);
+        DefaultDmnEngineConfiguration defaultDmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
+        configuration.setDmnEngineConfiguration(defaultDmnEngineConfiguration);
         return configuration;
     }
 
-
+    /**
+     * Service Beans
+     */
     @Bean
     public CipcValidationService retrieveValidation() {
         return new CipcValidationService();
     }
 
     @Bean
-    public GenerateReceiptService generateReceiptService() { return new GenerateReceiptService();
-    }
+    public GenerateReceiptService generateReceiptService() { return new GenerateReceiptService(); }
 
     @Bean
     public AwaitDocumentService awaitDocumentService() {
@@ -69,26 +72,11 @@ public class ServiceApplicationContext {
     public RetrieveUserRequestService retrieveUserRequest() { return new RetrieveUserRequestService(); }
 
     @Bean
-    public DmnEngine dmnEngine() {
-        // create default DMN engine configuration
-        DmnEngineConfiguration configuration = DmnEngineConfiguration
-                .createDefaultDmnEngineConfiguration();
+    public FetchDocumentsService fetchDocuments() { return new FetchDocumentsService(); }
 
-        // build a new DMN engine
-        DmnEngine dmnEngine = configuration.buildEngine();
-        return dmnEngine;
-    }
-
+    /**
+     * Listener Beans
+     */
     @Bean
-    public DmnDecision routeDecision() {
-        Resource resource = resourceLoader.getResource("classpath:/routeDecision.dmn");
-        InputStream is = null;
-        try {
-            is = resource.getInputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return dmnEngine.parseDecision("decision", is);
-    }
-
+    public TaskListener taskAssignListener() { return new TaskListener(); }
 }

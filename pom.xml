@@ -61,6 +61,12 @@
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <version>1.7.26</version>
+    </dependency>
+
   </dependencies>
 
   <build>
