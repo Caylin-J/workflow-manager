@@ -1,2 +1,2 @@
-# plexus-2.0
+# Workflow Management Prototype
  
